@@ -31,12 +31,11 @@
 
     <Button
         android:id="@+id/newConversationButton"
-        android:layout_width="match_parent"
+        android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:alpha="1"
         android:backgroundTint="#0C8FAFFF"
         android:contentDescription="@string/app_name"
-        android:text="开始新对话"
         app:icon="@android:drawable/ic_menu_edit"
         app:iconTint="#FFFFFF" />
 

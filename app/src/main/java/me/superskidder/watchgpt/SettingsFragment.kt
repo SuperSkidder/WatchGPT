@@ -32,7 +32,7 @@ class SettingsFragment : Fragment() {
 
         // 获取之前保存的设置
         val configManager = SimpleConfig(requireContext())
-        apikey.setText(configManager.getString("apikey", "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"))
+        apikey.setText(configManager.getString("apikey", ""))
         systemPrompt.setText(configManager.getString("systemPrompt", "You are a helpful assistant."))
         val gptTypeValue = configManager.getString("gptType", "gpt-3.5-turbo")
         val radioButton = gptType.findViewById<RadioButton>(getRadioButtonId(gptTypeValue))
