@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
 import me.superskidder.watchgpt.R
+import me.superskidder.watchgpt.config.SimpleConfig
 import me.superskidder.watchgpt.data.ChatCompletionMessage
 import me.superskidder.watchgpt.data.ChatGPTApi
 import me.superskidder.watchgpt.data.ChatGPTRequest
@@ -35,9 +36,11 @@ class MainFragment : Fragment() {
     private lateinit var newConversationButton: Button
     private lateinit var hint: TextView
 
-    private val apiKey = "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"
+    private var apiKey = ""
+    var systemPrompt = "You are a helpful assistant."
+
     private var messages: List<ChatCompletionMessage> =
-        listOf(ChatCompletionMessage("system", "You are a helpful assistant."))
+        listOf(ChatCompletionMessage("system", systemPrompt))
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,29 +68,40 @@ class MainFragment : Fragment() {
             sendMessage(messageText.text.toString())
         }
         hint.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("WatchGPT")
-            builder.setMessage(
-                "由SuperSkidder用❤开发\n" +
+            msgBox(
+                "WatchGPT", "由SuperSkidder用❤开发\n" +
                         "QQ:2869049757\n" +
-                        "API中转提供：©Cloudflare\n"
+                        "API中转提供：©Cloudflare\n", "明白"
             )
-            builder.setPositiveButton("明白") { _, _ ->
-                // 点击确定按钮的代码
-            }
-            val dialog = builder.create()
-            dialog.show()
         }
         newConversationButton.setOnClickListener {
             messageView.loadDataWithBaseURL(null, "", "text/html", "UTF-8", null)
 
-            messages = listOf(ChatCompletionMessage("system", "You are a helpful assistant."))
+            messages = listOf(ChatCompletionMessage("system", systemPrompt))
             sendButton.isClickable = true
         }
     }
+
+    fun msgBox(title: String, content: String, btn: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(title)
+        builder.setMessage(content)
+        builder.setPositiveButton(btn) { _, _ ->
+            // 点击确定按钮的代码
+        }
+        val dialog = builder.create()
+        dialog.show()
+
+    }
+
     private fun sendMessage(message: String) {
+        val configManager = SimpleConfig(requireContext())
+        apiKey = configManager.getString("apikey", "").toString()
+        systemPrompt = configManager.getString("systemPrompt", "").toString()
+        val gptTypeValue = configManager.getString("gptType", "gpt-3.5-turbo")
+
         val request = ChatGPTRequest(
-            "gpt-3.5-turbo", messages + listOf(
+            gptTypeValue, messages + listOf(
                 ChatCompletionMessage("user", message),
             )
         )
@@ -113,14 +127,7 @@ class MainFragment : Fragment() {
                 sendButton.isClickable = true
             } else {
                 sendButton.isClickable = true
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("失败")
-                builder.setMessage("获取请求返回失败")
-                builder.setPositiveButton("好") { _, _ ->
-                    // 点击确定按钮的代码
-                }
-                val dialog = builder.create()
-                dialog.show()
+                msgBox("错误", "请求超时", "了解")
             }
         }
     }
@@ -207,6 +214,7 @@ class MainFragment : Fragment() {
             }
         })
     }
+
     companion object {
         fun newInstance(): MainFragment {
             return MainFragment()

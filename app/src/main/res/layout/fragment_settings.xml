@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/model"
+    android:id="@+id/linear"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
@@ -47,6 +47,7 @@
                 android:textColorHint="@color/white" />
 
             <RadioGroup
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -70,6 +71,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="text-davinci-003"
+                    android:textColor="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/savebtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="保存" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="本程序由SuperSkidder开发，由用户自身行为产生后果与作者无关。\n ChatGPT转发服务由Cloudflare提供"
                     android:textColor="#FFFFFF" />
             </RadioGroup>
         </LinearLayout>
