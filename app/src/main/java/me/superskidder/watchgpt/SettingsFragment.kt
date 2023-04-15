@@ -37,16 +37,6 @@ class SettingsFragment : Fragment() {
         val gptTypeValue = configManager.getString("gptType", "gpt-3.5-turbo")
         val radioButton = gptType.findViewById<RadioButton>(getRadioButtonId(gptTypeValue))
         radioButton?.isChecked = true
-
-        savebtn.setOnClickListener {
-            saveConfig()
-        }
-
-        return view
-    }
-
-    fun saveConfig(){
-        val configManager = SimpleConfig(requireContext())
         apikey.setOnEditorActionListener { _, _, _ ->
             configManager.setString("apikey", apikey.text.toString())
             false
@@ -61,7 +51,17 @@ class SettingsFragment : Fragment() {
             val radioButton = gptType.findViewById<RadioButton>(checkedId)
             configManager.setString("gptType", radioButton?.text.toString())
         }
+        savebtn.setOnClickListener {
+            saveConfig()
+        }
 
+        return view
+    }
+
+    fun saveConfig(){
+        val configManager = SimpleConfig(requireContext())
+        configManager.setString("apikey", apikey.text.toString())
+        configManager.setString("systemPrompt", systemPrompt.text.toString())
     }
 
     private fun getRadioButtonId(value: String?): Int {
