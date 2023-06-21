@@ -5,14 +5,7 @@
 1. 与AI聊天
 2. 保存system prompts和api key
 3. 选择模型
-4. Markdown支持
-
-## 目标
-1. 聊天记录
-2. 代码高亮
-3. UI调整
-4. System Prompts库
-5. 多语言支持
+4. 语音播放回复
 
 ## 如何使用
 1. 到platform.openai.com，找到你的APIkey，复制到你的手表上
@@ -22,11 +15,7 @@
 
 ## 贡献
 1. 克隆并编码
-2. PR
-
-截图:  
-![QQ截图20230416043629](https://user-images.githubusercontent.com/61504912/232252230-b6aa5d00-523b-4897-8c5a-97151e99f89f.png)
-![QQ截图20230416043659](https://user-images.githubusercontent.com/61504912/232252233-41ad6861-34b3-46ad-b4e1-a34b47657b22.png)
+2. Pull request
 
 
 # WatchGPT
@@ -36,14 +25,7 @@ A ChatGPT client for Android watch
 1. Chat with AI
 2. Save system prompts and apikey
 3. Switch models
-4. Markdown support
-
-## Goals
-1. Chat history
-2. Code highlights
-3. UI optimize
-4. System Prompts library
-5. Multi languages support
+4. Voice playback
 
 ## How to use
 1. On platform.openai.com, find your APIkey, copy it to your watch
@@ -55,6 +37,5 @@ A ChatGPT client for Android watch
 1. Clone and code
 2. Pull request
 
-Screenshots:  
-![QQ截图20230416043629](https://user-images.githubusercontent.com/61504912/232252230-b6aa5d00-523b-4897-8c5a-97151e99f89f.png)
-![QQ截图20230416043659](https://user-images.githubusercontent.com/61504912/232252233-41ad6861-34b3-46ad-b4e1-a34b47657b22.png)
+![1](https://user-images.githubusercontent.com/61504912/232252230-b6aa5d00-523b-4897-8c5a-97151e99f89f.png)
+![2](https://user-images.githubusercontent.com/61504912/232252233-41ad6861-34b3-46ad-b4e1-a34b47657b22.png)
