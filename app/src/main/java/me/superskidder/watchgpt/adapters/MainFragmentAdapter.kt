@@ -3,6 +3,7 @@ package me.superskidder.watchgpt.adapters
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import me.superskidder.watchgpt.MainFragment
 import me.superskidder.watchgpt.SettingsFragment
 
 class MainFragmentAdapter(fragmentActivity: FragmentActivity) :

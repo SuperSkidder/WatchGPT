@@ -1,7 +1,6 @@
+package me.superskidder.watchgpt
+
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.OnInitListener
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +11,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
-import me.superskidder.watchgpt.R
 import me.superskidder.watchgpt.config.SimpleConfig
 import me.superskidder.watchgpt.data.ChatCompletionMessage
 import me.superskidder.watchgpt.data.ChatGPTApi
 import me.superskidder.watchgpt.data.ChatGPTRequest
 import me.superskidder.watchgpt.data.ChatGPTResponse
+import me.superskidder.watchgpt.history.messages
+import me.superskidder.watchgpt.history.readHistory
+import me.superskidder.watchgpt.history.saveHistory
 import me.superskidder.watchgpt.speaking.BaiduTranslator
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -26,7 +27,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
@@ -42,14 +42,12 @@ class MainFragment : Fragment() {
     private var apiKey = ""
     var systemPrompt = "You are a helpful assistant."
 
-    private var messages: List<ChatCompletionMessage> =
-        listOf(ChatCompletionMessage("system", systemPrompt))
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
@@ -100,6 +98,8 @@ class MainFragment : Fragment() {
         }
 
         baiduTranslator = BaiduTranslator()
+        readHistory(requireContext())
+        update()
     }
 
     fun msgBox(title: String, content: String, btn: String) {
@@ -111,6 +111,11 @@ class MainFragment : Fragment() {
         }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        saveHistory(requireContext())
     }
 
 
