@@ -19,5 +19,4 @@ fun readHistory(context: Context) {
     val gson = GsonBuilder().create()
     val config = configManager.getString("history", gson.toJson(messages))
     messages = gson.fromJson(config, ArrayList<ChatCompletionMessage>().javaClass)
-    println(messages.forEach(::println))
 }

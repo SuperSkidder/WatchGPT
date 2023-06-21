@@ -158,7 +158,7 @@ class MainFragment : Fragment() {
     }
 
     private fun update() {
-        val markdown = buildString {
+        val content = buildString {
             val usemessages = messages.drop(1)
             usemessages.forEach { message ->
                 appendLine(
@@ -175,7 +175,7 @@ class MainFragment : Fragment() {
             }
         }
 
-        messageView.text = markdown
+        messageView.text = content
     }
 
     private fun requestCompletion(request: ChatGPTRequest, callback: (ChatGPTResponse?) -> Unit) {
