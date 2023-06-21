@@ -73,6 +73,14 @@
                     android:text="text-davinci-003"
                     android:textColor="#FFFFFF" />
 
+                <Switch
+                    android:id="@+id/speakout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:text="朗读回复"
+                    android:textColor="@color/white" />
+
                 <Button
                     android:id="@+id/savebtn"
                     android:layout_width="match_parent"
@@ -83,7 +91,7 @@
                     android:id="@+id/textView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="本程序由SuperSkidder开发，由用户自身行为产生后果与作者无关。\n ChatGPT转发服务由Cloudflare提供"
+                    android:text="仅供学习交流，用户自身行为产生后果与作者无关"
                     android:textColor="#FFFFFF" />
             </RadioGroup>
         </LinearLayout>

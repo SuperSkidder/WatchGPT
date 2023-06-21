@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Switch
 import androidx.fragment.app.Fragment
 import me.superskidder.watchgpt.config.SimpleConfig
 
@@ -17,6 +18,8 @@ class SettingsFragment : Fragment() {
     private lateinit var systemPrompt: EditText
     private lateinit var gptType: RadioGroup
     private lateinit var savebtn: Button
+    private lateinit var speakout: Switch
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,11 +32,18 @@ class SettingsFragment : Fragment() {
         systemPrompt = view.findViewById(R.id.api_key2)
         gptType = view.findViewById(R.id.radioGroup)
         savebtn = view.findViewById(R.id.savebtn)
+        speakout = view.findViewById(R.id.speakout)
 
         // 获取之前保存的设置
         val configManager = SimpleConfig(requireContext())
         apikey.setText(configManager.getString("apikey", ""))
-        systemPrompt.setText(configManager.getString("systemPrompt", "You are a helpful assistant."))
+        systemPrompt.setText(
+            configManager.getString(
+                "systemPrompt",
+                "You are a helpful assistant."
+            )
+        )
+        speakout.isChecked = configManager.getBoolean("speakout", false)
         val gptTypeValue = configManager.getString("gptType", "gpt-3.5-turbo")
         val radioButton = gptType.findViewById<RadioButton>(getRadioButtonId(gptTypeValue))
         radioButton?.isChecked = true
@@ -55,10 +65,14 @@ class SettingsFragment : Fragment() {
             saveConfig()
         }
 
+        speakout.setOnClickListener {
+            configManager.setBoolean("speakout", speakout.isChecked)
+        }
+
         return view
     }
 
-    fun saveConfig(){
+    fun saveConfig() {
         val configManager = SimpleConfig(requireContext())
         configManager.setString("apikey", apikey.text.toString())
         configManager.setString("systemPrompt", systemPrompt.text.toString())
@@ -67,8 +81,8 @@ class SettingsFragment : Fragment() {
     private fun getRadioButtonId(value: String?): Int {
         return when (value) {
             "gpt-3.5-turbo" -> R.id.radioButton
-            "code-davinci-002" -> R.id.radioButton2
-            "text-davinci-003" -> R.id.radioButton3
+            "gpt-4" -> R.id.radioButton2
+            "gpt-3.5-turbo-0613" -> R.id.radioButton3
             else -> -1
         }
     }

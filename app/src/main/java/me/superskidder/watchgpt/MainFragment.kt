@@ -1,8 +1,10 @@
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.OnInitListener
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ScrollView
@@ -16,25 +18,26 @@ import me.superskidder.watchgpt.data.ChatCompletionMessage
 import me.superskidder.watchgpt.data.ChatGPTApi
 import me.superskidder.watchgpt.data.ChatGPTRequest
 import me.superskidder.watchgpt.data.ChatGPTResponse
+import me.superskidder.watchgpt.speaking.BaiduTranslator
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.commonmark.node.Node
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.html.HtmlRenderer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Locale
 import java.util.concurrent.TimeUnit
+
 
 class MainFragment : Fragment() {
     private lateinit var messageText: EditText
-    private lateinit var messageView: WebView
+    private lateinit var messageView: TextView
     private lateinit var messageScroll: ScrollView
     private lateinit var sendButton: Button
     private lateinit var newConversationButton: Button
     private lateinit var hint: TextView
+    private lateinit var baiduTranslator: BaiduTranslator
 
     private var apiKey = ""
     var systemPrompt = "You are a helpful assistant."
@@ -46,12 +49,12 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         // Initialize views
         hint = view.findViewById(R.id.hint)
 
@@ -62,7 +65,6 @@ class MainFragment : Fragment() {
 
         messageView = view.findViewById(R.id.messageView)
         messageView.setBackgroundColor(resources.getColor(android.R.color.black))
-        messageView.settings.loadsImagesAutomatically = true
 
         sendButton.setOnClickListener {
             sendMessage(messageText.text.toString())
@@ -74,12 +76,30 @@ class MainFragment : Fragment() {
                         "API中转提供：©Cloudflare\n", "明白"
             )
         }
-        newConversationButton.setOnClickListener {
-            messageView.loadDataWithBaseURL(null, "", "text/html", "UTF-8", null)
+        val configManager = SimpleConfig(requireContext())
 
+        systemPrompt = configManager.getString("systemPrompt", "").toString()
+        messages = listOf(ChatCompletionMessage("system", systemPrompt))
+        newConversationButton.setOnClickListener {
+            messageView.text = ""
             messages = listOf(ChatCompletionMessage("system", systemPrompt))
             sendButton.isClickable = true
         }
+
+        if (configManager.getBoolean("isFirstStartup", true)) {
+            msgBox(
+                "第一次使用？",
+                "左滑可以切换页面，第一次使用需配置apikey 获取apikey: platform.openai.com(需要有chatgpt账号)\n" +
+                        "修改配置项后必须点击保存才能正常使用哦~\n" +
+                        "systemprompt是给AI的情景预设，你可以指定它的职责或特定回答方式，如：充当一名英语教师、充当Linux终端、扮演我的朋友 等\n" +
+                        "点击聊天界面的笔图标可以清除记录~\n" +
+                        "加入WatchGPT QQ交流群：756647981",
+                "完成"
+            )
+            configManager.setBoolean("isFirstStartup", false)
+        }
+
+        baiduTranslator = BaiduTranslator()
     }
 
     fun msgBox(title: String, content: String, btn: String) {
@@ -91,8 +111,8 @@ class MainFragment : Fragment() {
         }
         val dialog = builder.create()
         dialog.show()
-
     }
+
 
     private fun sendMessage(message: String) {
         val configManager = SimpleConfig(requireContext())
@@ -120,10 +140,10 @@ class MainFragment : Fragment() {
                 messageScroll.post { messageScroll.fullScroll(View.FOCUS_DOWN) }
                 update()
                 //滑动到页面最下方
-                messageView.evaluateJavascript(
-                    "window.scrollTo(0, document.body.scrollHeight);",
-                    null
-                )
+                messageScroll.post { messageScroll.fullScroll(ScrollView.FOCUS_DOWN) }
+                if (configManager.getBoolean("speakout",false)){
+                    baiduTranslator.speak(generatedText,"zh")
+                }
                 sendButton.isClickable = true
             } else {
                 sendButton.isClickable = true
@@ -134,14 +154,15 @@ class MainFragment : Fragment() {
 
     private fun update() {
         val markdown = buildString {
-            messages.forEach { message ->
+            val usemessages = messages.drop(1)
+            usemessages.forEach { message ->
                 appendLine(
                     "${
                         when (message.role) {
-                            "user" -> "**你**"
-                            "assistant" -> "**GPT**"
+                            "user" -> "你"
+                            "assistant" -> "GPT"
                             else -> {
-                                "系统"
+                                "Unknown"
                             }
                         }
                     }: ${message.content}\n"
@@ -149,30 +170,7 @@ class MainFragment : Fragment() {
             }
         }
 
-        val parser = Parser.builder().build()
-        val renderer = HtmlRenderer.builder().build()
-        val document: Node = parser.parse(markdown)
-
-        // 将节点树转换为HTML文本
-        var html = renderer.render(document)
-        // 代码高亮
-        html = """
-        <html>
-        <head>
-        <style>
-        body { color:white }
-        </style>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
-        <script>hljs.highlightAll();</script>
-        </head>
-        <body>
-        $html
-        </body>
-        </html>
-    """.trimIndent()
-        // 在WebView中显示HTML文本
-        messageView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
+        messageView.text = markdown
     }
 
     private fun requestCompletion(request: ChatGPTRequest, callback: (ChatGPTResponse?) -> Unit) {
